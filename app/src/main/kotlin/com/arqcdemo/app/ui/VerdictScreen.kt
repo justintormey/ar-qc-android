@@ -43,8 +43,8 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
             title = "PART A — JOB 471471",
             lines = listOf(
                 "Surface finish" to "smooth, no defects",
-                "Vent holes" to "6 / 6 present",
-                "Warp" to "0.0 mm (in tolerance)",
+                "Vent openings" to "9 / 9 present",
+                "Warp" to "0.04 mm (in tolerance)",
             ),
             verdictText = "PASS",
             symbol = "✓",
@@ -54,7 +54,7 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
         "B" -> VerdictSpec(
             title = "PART B — JOB 471471",
             lines = listOf(
-                "Vent holes" to "0 / 6 detected",
+                "Vent openings" to "0 / 6 detected",
                 "Warp" to "1.8 mm at base",
                 "Surface finish" to "acceptable",
                 "Layer adhesion" to "within tolerance",
@@ -69,7 +69,7 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
             lines = listOf(
                 "Surface finish" to "extruder blobs, stringing",
                 "Layer adhesion" to "failed",
-                "Vent holes" to "obstructed by filament",
+                "Vent openings" to "0 / 6 detected",
                 "Defects" to "12+ flagged",
             ),
             verdictText = "SCRAP",
