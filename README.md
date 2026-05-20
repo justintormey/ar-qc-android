@@ -35,11 +35,11 @@ Flow:
 
 ## Killer feature: real CV detection
 
-Print the QR codes in [`tools/qr-codes/`](tools/qr-codes/) (or open [`print-sheet.html`](tools/qr-codes/print-sheet.html) for a 3-up print layout). Attach one to the back / edge of each metal part:
+Print the QR codes in [`tools/qr-codes/`](tools/qr-codes/) (or open [`print-sheet.html`](tools/qr-codes/print-sheet.html) for a 3-up print layout). Attach one to the back / edge of each 3D-printed part:
 
-- `qr-A.png` → Part A (90° bend, no defects) → PASS
-- `qr-B.png` → Part B (~75° underbend, in tolerance bounds) → REWORK
-- `qr-C.png` → Part C (bent + dented + scratched) → SCRAP
+- `qr-A.png` → Part A (smooth finish, vent holes present, no warping) → PASS
+- `qr-B.png` → Part B (missing vent holes, warped at the base) → REWORK
+- `qr-C.png` → Part C (extruder blobs, terrible layer adhesion, stringing) → SCRAP
 
 When the camera sees one, ML Kit decodes it in ~30 ms and the matching verdict overlay fires on the headset within ~100 ms. No operator-controller round-trip required.
 

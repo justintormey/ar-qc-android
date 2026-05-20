@@ -40,11 +40,11 @@ private data class VerdictSpec(
 fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
     val spec = when (part.uppercase()) {
         "A" -> VerdictSpec(
-            title = "PART A — JOB 4471",
+            title = "PART A — JOB 471471",
             lines = listOf(
-                "Bend angle" to "90.0° ± 0.1°",
-                "Surface" to "clean, no defects",
-                "Dimensions" to "within tolerance",
+                "Surface finish" to "smooth, no defects",
+                "Vent holes" to "6 / 6 present",
+                "Warp" to "0.0 mm (in tolerance)",
             ),
             verdictText = "PASS",
             symbol = "✓",
@@ -52,12 +52,12 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
             cue = "Place the part in the PASS zone",
         )
         "B" -> VerdictSpec(
-            title = "PART B — JOB 4471",
+            title = "PART B — JOB 471471",
             lines = listOf(
-                "Bend angle" to "75.4°",
-                "Target" to "90.0°",
-                "Deviation" to "−14.6° underbend",
-                "Surface" to "clean",
+                "Vent holes" to "0 / 6 detected",
+                "Warp" to "1.8 mm at base",
+                "Surface finish" to "acceptable",
+                "Layer adhesion" to "within tolerance",
             ),
             verdictText = "REWORK",
             symbol = "⚠",
@@ -65,11 +65,12 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
             cue = "Place the part in the REWORK zone",
         )
         else -> VerdictSpec(
-            title = "PART C — JOB 4471",
+            title = "PART C — JOB 471471",
             lines = listOf(
-                "Bend angle" to "88.2° (in tolerance)",
-                "Surface" to "4 defects detected",
-                "Stress fracture" to "risk: HIGH",
+                "Surface finish" to "extruder blobs, stringing",
+                "Layer adhesion" to "failed",
+                "Vent holes" to "obstructed by filament",
+                "Defects" to "12+ flagged",
             ),
             verdictText = "SCRAP",
             symbol = "✕",
