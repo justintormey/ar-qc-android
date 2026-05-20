@@ -57,7 +57,7 @@ fun BuilderApp(
             )
             BuilderScene.Scanning -> BuilderScanningScreen(
                 cameraGranted = cameraGranted,
-                onBuilderQrDetected = viewModel::onBuilderQrDetected,
+                onBuilderFrame = viewModel::onBuilderFrame,
             )
             is BuilderScene.VerdictPass -> BuilderVerdictPassScreen(
                 part = s.part.toString(),
@@ -97,13 +97,13 @@ fun BuilderApp(
 @Composable
 fun BuilderScanningScreen(
     cameraGranted: Boolean,
-    onBuilderQrDetected: (part: Char, isPass: Boolean) -> Unit,
+    onBuilderFrame: (codes: Set<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val analyzer = remember { QrAnalyzer(onBuilder = onBuilderQrDetected) }
+    val analyzer = remember { QrAnalyzer(onBuilderFrame = onBuilderFrame) }
     val controller = remember { CameraXController(context) }
 
     DisposableEffect(Unit) {

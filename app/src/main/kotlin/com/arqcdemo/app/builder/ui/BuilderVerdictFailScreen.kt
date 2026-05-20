@@ -26,8 +26,42 @@ import com.arqcdemo.app.ui.components.FocusableButton
 import com.arqcdemo.app.ui.theme.HudDim
 import com.arqcdemo.app.ui.theme.Scrap
 
+private data class FailSpec(val stepLabel: String, val checks: List<Pair<String, String>>, val recover: String)
+
+private val FAIL_SPECS = mapOf(
+    'A' to FailSpec(
+        stepLabel = "STEP 1 — A + B",
+        checks = listOf(
+            "Velcro" to "engaged",
+            "Flanges" to "facing inward — inverted",
+            "Shape" to "T-form not detected",
+        ),
+        recover = "Peel the velcro. Flip B 180°. Re-attach so the flanges face AWAY from each other.",
+    ),
+    'B' to FailSpec(
+        stepLabel = "STEP 2 — C ONTO B",
+        checks = listOf(
+            "String tie" to "secure",
+            "Position" to "C joined to B",
+            "Flange" to "pointing into center — inverted",
+        ),
+        recover = "Untie the string. Flip C 180°. Re-tie so the flange points AWAY from the center.",
+    ),
+    'C' to FailSpec(
+        stepLabel = "STEP 3 — D",
+        checks = listOf(
+            "Velcro" to "engaged",
+            "Flange" to "aligned with C's flange — inverted",
+            "QR check" to "CF visible (D in wrong orientation)",
+        ),
+        recover = "Peel the velcro. Flip D 180°. Re-attach so its flange opposes C's flange.",
+    ),
+)
+
 @Composable
 fun BuilderVerdictFailScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
+    val key = part.lastOrNull()?.uppercaseChar() ?: 'A'
+    val spec = FAIL_SPECS[key] ?: FAIL_SPECS.getValue('A')
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -43,18 +77,14 @@ fun BuilderVerdictFailScreen(part: String, focusedIndex: Int = 0, modifier: Modi
                     .padding(horizontal = 24.dp, vertical = 18.dp),
             ) {
                 Text(
-                    text = "PART $part — JOB 5519",
+                    text = "${spec.stepLabel} — JOB 526526",
                     color = HudDim,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 13.sp,
                     letterSpacing = 2.sp,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                listOf(
-                    "Bolts" to "2 of 2 installed",
-                    "Orientation" to "inverted — spec face is inward",
-                    "Surface" to "clean",
-                ).forEach { (k, v) ->
+                spec.checks.forEach { (k, v) ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -87,7 +117,7 @@ fun BuilderVerdictFailScreen(part: String, focusedIndex: Int = 0, modifier: Modi
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Remove the two bolts. Flip the sub-piece 180°. Re-install.",
+                    text = spec.recover,
                     color = Scrap,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,

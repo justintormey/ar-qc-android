@@ -55,7 +55,7 @@ fun BuilderCompleteScreen(
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 526526 — ${counts.pass} ${if (counts.pass == 1) "component" else "components"} passed",
+                text = "Job 526526 — ${counts.pass} of 3 steps passed",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,

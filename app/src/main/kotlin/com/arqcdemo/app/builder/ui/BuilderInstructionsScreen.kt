@@ -25,19 +25,56 @@ import com.arqcdemo.app.ui.theme.HudDim
 
 /**
  * Assembly instructions card. Shown after Welcome (begin) and after every
- * verdict — PASS routes here for the next part, FAIL routes here for the
- * same part (the rework loop).
+ * verdict — PASS routes here for the next step, FAIL routes here for the
+ * same step (the rework loop).
+ *
+ * Each step has its own step list keyed by the partLabel (A/B/C from the
+ * scene). The procedure assembles four 3D-printed angle brackets across
+ * three steps: A+B (velcro, T-shape), then C onto B (string-tied), then D
+ * (velcro, opposing C's flange).
  */
-private val STEPS = listOf(
-    "Pick up the sub-piece and 2 bolts.",
-    "Align the sub-piece with the bolt pattern on the base.",
-    "Orient it so the spec face points outward (the recessed corner = up).",
-    "Install both bolts and finger-tighten.",
-    "Hold the finished assembly up to the lens.",
+private data class StepCard(val header: String, val title: String, val steps: List<String>)
+
+private val STEP_CARDS = mapOf(
+    'A' to StepCard(
+        header = "STEP 1 of 3 — ATTACH A + B",
+        title = "Form the T",
+        steps = listOf(
+            "Pick up brackets A and B and the velcro tabs attached to each.",
+            "Press A and B together face-to-face using the velcro tabs.",
+            "Align the end channel flanges so they face AWAY from each other.",
+            "The two pieces should form a T-shape.",
+            "Hold the assembly up to the lens and scan.",
+        ),
+    ),
+    'B' to StepCard(
+        header = "STEP 2 of 3 — ATTACH C TO B",
+        title = "Tie C onto B",
+        steps = listOf(
+            "Pick up bracket C and the supplied string.",
+            "Tie C to bracket B using the string — secure but not over-tightened.",
+            "Position C so its end channel flange points AWAY from the center of the assembly.",
+            "Hold the assembly up to the lens and scan.",
+        ),
+    ),
+    'C' to StepCard(
+        header = "STEP 3 of 3 — ATTACH D",
+        title = "Mount D opposing C",
+        steps = listOf(
+            "Pick up bracket D and use the velcro tabs already attached.",
+            "Press D onto the assembly with its velcro tabs.",
+            "Position D so its channel flange points AWAY from C's channel flange (opposing sides).",
+            "Hold the assembly up so BOTH the B-face and C-face QRs are visible.",
+            "Scan — pass requires BP and CP both in frame.",
+        ),
+    ),
 )
 
 @Composable
 fun BuilderInstructionsScreen(partLabel: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
+    val key = partLabel.lastOrNull()?.uppercaseChar() ?: 'A'
+    val card = STEP_CARDS[key] ?: STEP_CARDS.getValue('A')
+
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -48,19 +85,19 @@ fun BuilderInstructionsScreen(partLabel: String, focusedIndex: Int = 0, modifier
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                text = "ASSEMBLY — ${partLabel.uppercase()}",
+                text = card.header,
                 color = HudDim,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp,
                 letterSpacing = 2.sp,
             )
             Text(
-                text = "Steps",
+                text = card.title,
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
             )
-            STEPS.forEachIndexed { i, step ->
+            card.steps.forEachIndexed { i, step ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),

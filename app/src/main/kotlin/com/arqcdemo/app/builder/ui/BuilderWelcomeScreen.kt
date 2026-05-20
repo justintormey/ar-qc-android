@@ -41,13 +41,13 @@ fun BuilderWelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 526526 — bracket sub-assembly",
+                text = "Job 526526 — angle-bracket sub-assembly",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Text(text = "Three components to assemble.", color = Color.White, fontSize = 18.sp)
-            Text(text = "Attach the sub-piece. Hold up for inspection.", color = Color.White, fontSize = 18.sp)
+            Text(text = "Four 3D-printed angle brackets — A, B, C, D.", color = Color.White, fontSize = 18.sp)
+            Text(text = "Three steps. Scan after each.", color = Color.White, fontSize = 18.sp)
             Text(
                 text = "Orientation matters — flip if you fail.",
                 color = HudDim,

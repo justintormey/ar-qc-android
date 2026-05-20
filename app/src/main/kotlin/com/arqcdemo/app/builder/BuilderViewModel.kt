@@ -102,9 +102,33 @@ class BuilderViewModel : ViewModel() {
         newBus.send(BusMessage.Ready)
     }
 
-    /** QR analyzer entry point — emits the matching verdict. */
-    fun onBuilderQrDetected(part: Char, isPass: Boolean) {
-        handle(BusMessage.BuilderVerdict(part.toString(), if (isPass) "pass" else "fail"))
+    /**
+     * QR analyzer entry point — receives the full set of Builder QR codes
+     * visible in the current camera frame and applies step-aware rules.
+     *
+     * Step 1 (currentPart=A): AP → pass, AF → fail.
+     * Step 2 (currentPart=B): BP → pass, BF → fail.
+     * Step 3 (currentPart=C): CF → fail; pass only if BP AND CP both visible
+     *   (compound check — partial detection just keeps scanning so the user
+     *   re-positions until both step-2 and step-3 QRs are in frame at once).
+     */
+    fun onBuilderFrame(codes: Set<String>) {
+        if (_ui.value.scene !is BuilderScene.Scanning) return
+        when (_ui.value.currentPart) {
+            'A' -> {
+                if ("AF" in codes) goVerdict("A", false)
+                else if ("AP" in codes) goVerdict("A", true)
+            }
+            'B' -> {
+                if ("BF" in codes) goVerdict("B", false)
+                else if ("BP" in codes) goVerdict("B", true)
+            }
+            'C' -> {
+                if ("CF" in codes) goVerdict("C", false)
+                else if ("BP" in codes && "CP" in codes) goVerdict("C", true)
+                // CP alone (no BP) → keep scanning; user re-positions to expose both.
+            }
+        }
     }
 
     private fun handle(msg: BusMessage) {

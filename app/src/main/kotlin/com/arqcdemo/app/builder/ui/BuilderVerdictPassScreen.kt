@@ -26,8 +26,42 @@ import com.arqcdemo.app.ui.components.FocusableButton
 import com.arqcdemo.app.ui.theme.HudDim
 import com.arqcdemo.app.ui.theme.Pass
 
+private data class PassSpec(val stepLabel: String, val checks: List<Pair<String, String>>, val cue: String)
+
+private val PASS_SPECS = mapOf(
+    'A' to PassSpec(
+        stepLabel = "STEP 1 — A + B",
+        checks = listOf(
+            "Velcro" to "both tabs engaged",
+            "Flanges" to "aligned, facing outward",
+            "Shape" to "T-form verified",
+        ),
+        cue = "Step 1 complete — assembly to spec.",
+    ),
+    'B' to PassSpec(
+        stepLabel = "STEP 2 — C ONTO B",
+        checks = listOf(
+            "String tie" to "secure",
+            "Position" to "C joined to B",
+            "Flange" to "away from center",
+        ),
+        cue = "Step 2 complete — assembly to spec.",
+    ),
+    'C' to PassSpec(
+        stepLabel = "STEP 3 — D",
+        checks = listOf(
+            "Velcro" to "tabs engaged",
+            "Flange" to "opposite C's flange",
+            "QR check" to "BP + CP both visible",
+        ),
+        cue = "Step 3 complete — full assembly to spec.",
+    ),
+)
+
 @Composable
 fun BuilderVerdictPassScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
+    val key = part.lastOrNull()?.uppercaseChar() ?: 'A'
+    val spec = PASS_SPECS[key] ?: PASS_SPECS.getValue('A')
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -43,18 +77,14 @@ fun BuilderVerdictPassScreen(part: String, focusedIndex: Int = 0, modifier: Modi
                     .padding(horizontal = 24.dp, vertical = 18.dp),
             ) {
                 Text(
-                    text = "PART $part — JOB 5519",
+                    text = "${spec.stepLabel} — JOB 526526",
                     color = HudDim,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 13.sp,
                     letterSpacing = 2.sp,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                listOf(
-                    "Bolts" to "2 of 2 installed",
-                    "Orientation" to "correct — spec face out",
-                    "Surface" to "clean",
-                ).forEach { (k, v) ->
+                spec.checks.forEach { (k, v) ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -87,7 +117,7 @@ fun BuilderVerdictPassScreen(part: String, focusedIndex: Int = 0, modifier: Modi
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Component assembled to spec.",
+                    text = spec.cue,
                     color = Pass,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -98,7 +128,7 @@ fun BuilderVerdictPassScreen(part: String, focusedIndex: Int = 0, modifier: Modi
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 FocusableButton(
-                    label = "Next part",
+                    label = if (key == 'C') "Finish" else "Next step",
                     focused = focusedIndex == 0,
                     onClick = {},
                     modifier = Modifier.weight(1f),
