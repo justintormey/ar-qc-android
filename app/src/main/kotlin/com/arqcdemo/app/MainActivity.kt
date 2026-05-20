@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
 import android.view.KeyEvent
+import android.view.MotionEvent
 import androidx.lifecycle.lifecycleScope
 import com.arqcdemo.app.input.WheelInput
 import com.arqcdemo.app.settings.Prefs
@@ -35,8 +36,14 @@ class MainActivity : ComponentActivity() {
 
     /** Forward Argo scroll-wheel + click KeyEvents to the global WheelInput. */
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (WheelInput.dispatch(event)) return true
+        if (WheelInput.dispatchKey(event)) return true
         return super.dispatchKeyEvent(event)
+    }
+
+    /** Forward generic motion events (mouse/rotary wheel ACTION_SCROLL) to WheelInput. */
+    override fun dispatchGenericMotionEvent(event: MotionEvent): Boolean {
+        if (WheelInput.dispatchMotion(event)) return true
+        return super.dispatchGenericMotionEvent(event)
     }
 
     private val requestCamera = registerForActivityResult(

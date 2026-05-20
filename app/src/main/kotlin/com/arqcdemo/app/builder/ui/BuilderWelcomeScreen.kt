@@ -41,7 +41,7 @@ fun BuilderWelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 5519 — bracket sub-assembly",
+                text = "Job 526526 — bracket sub-assembly",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,

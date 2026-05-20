@@ -41,7 +41,7 @@ fun WelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 4471 — 16-ga bracket inspection",
+                text = "Job 471471 — 16-ga bracket inspection",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,

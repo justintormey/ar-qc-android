@@ -50,7 +50,7 @@ fun CompleteScreen(counts: Counts, elapsedMs: Long, focusedIndex: Int = 0, modif
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 4471 — $total ${if (total == 1) "part" else "parts"}",
+                text = "Job 471471 — $total ${if (total == 1) "part" else "parts"}",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,

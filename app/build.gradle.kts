@@ -22,6 +22,25 @@ android {
         }
     }
 
+    // Two product flavors → two APKs with distinct applicationIds. The
+    // DigiLens Argo launcher dedupes app-drawer entries by package, so to get
+    // two icons we ship two installable packages. Both flavors compile the
+    // same shared source set under src/main; each flavor's manifest pins the
+    // LAUNCHER intent-filter onto only its own Activity.
+    flavorDimensions += "appType"
+    productFlavors {
+        create("qc") {
+            dimension = "appType"
+            applicationId = "com.arqcdemo.qc"
+            resValue("string", "app_label", "AR QC")
+        }
+        create("builder") {
+            dimension = "appType"
+            applicationId = "com.arqcdemo.builder"
+            resValue("string", "app_label", "BUILD")
+        }
+    }
+
     buildTypes {
         debug {
             isMinifyEnabled = false

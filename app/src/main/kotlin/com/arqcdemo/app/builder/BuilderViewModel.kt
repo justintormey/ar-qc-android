@@ -50,6 +50,11 @@ data class BuilderUiState(
     val roomPin: String = "",
     val focusedIndex: Int = 0,
     val currentPart: Char = 'A',
+    /** Parts that have already passed this session — their PASS QRs are ignored
+     *  on subsequent scans so the verdict doesn't keep re-firing while the
+     *  passed pieces remain in view on the workbench. FAIL QRs still fire
+     *  (relevant for rework loops). */
+    val passedParts: Set<Char> = emptySet(),
 )
 
 class BuilderViewModel : ViewModel() {
@@ -178,6 +183,7 @@ class BuilderViewModel : ViewModel() {
                 elapsedMs = 0L,
                 focusedIndex = 0,
                 currentPart = 'A',
+                passedParts = emptySet(),
             )
         }
         firstScanAt = 0L
@@ -195,14 +201,25 @@ class BuilderViewModel : ViewModel() {
     private fun goVerdict(partStr: String, isPass: Boolean) {
         val part = partStr.uppercase().firstOrNull() ?: return
         if (part !in "ABC") return
+        if (isPass && part in _ui.value.passedParts) {
+            Log.i(TAG, "ignoring PASS for $part — already passed this session")
+            return
+        }
         val newCounts = if (isPass) {
             _ui.value.counts.copy(pass = _ui.value.counts.pass + 1)
         } else {
             _ui.value.counts.copy(fail = _ui.value.counts.fail + 1)
         }
+        val newPassed = if (isPass) _ui.value.passedParts + part else _ui.value.passedParts
         val scene = if (isPass) BuilderScene.VerdictPass(part) else BuilderScene.VerdictFail(part)
         _ui.update {
-            it.copy(scene = scene, counts = newCounts, focusedIndex = 0, currentPart = part)
+            it.copy(
+                scene = scene,
+                counts = newCounts,
+                focusedIndex = 0,
+                currentPart = part,
+                passedParts = newPassed,
+            )
         }
         bus?.send(BusMessage.Scene("verdict-${part}-${if (isPass) "pass" else "fail"}"))
         bus?.send(BusMessage.VerdictShown(part.toString(), if (isPass) "pass" else "fail"))
