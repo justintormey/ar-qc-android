@@ -1,0 +1,23 @@
+# Build outputs
+build/
+app/build/
+*.apk
+.gradle/
+.cxx/
+local.properties
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+
+# Internal planning + handoff notes — kept under ~/.claude/planning/, never tracked
+planning/
+MORNING-BRIEFING.md
+notes/

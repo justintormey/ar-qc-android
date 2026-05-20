@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Argo QC — QR stickers</title>
+    <style>
+      @page { margin: 12mm; }
+      body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 16mm; color: #000; }
+      h1 { font-size: 16pt; margin: 0 0 4mm; }
+      p { font-size: 10pt; color: #444; margin: 0 0 10mm; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12mm;
+        max-width: 180mm;
+      }
+      .card {
+        border: 0.4mm dashed #888;
+        padding: 6mm;
+        text-align: center;
+        page-break-inside: avoid;
+      }
+      .card img { width: 40mm; height: 40mm; image-rendering: pixelated; }
+      .card .label { font-family: ui-monospace, monospace; font-size: 14pt; font-weight: 700; margin-top: 4mm; }
+      .card .hint { font-size: 8pt; color: #666; margin-top: 1mm; }
+    </style>
+  </head>
+  <body>
+    <h1>Argo QC — Part Identification QR Codes</h1>
+    <p>Cut each card along the dashed line. Tape one QR to the back of each corresponding aluminum part — small enough to be unobtrusive, large enough for the Argo camera to read at arm's-length.</p>
+
+    <div class="grid">
+      <div class="card">
+        <img src="qr-A.png" alt="QR for Part A" />
+        <div class="label">PART A</div>
+        <div class="hint">90° bend, no defects → PASS</div>
+      </div>
+      <div class="card">
+        <img src="qr-B.png" alt="QR for Part B" />
+        <div class="label">PART B</div>
+        <div class="hint">~75° underbend → REWORK</div>
+      </div>
+      <div class="card">
+        <img src="qr-C.png" alt="QR for Part C" />
+        <div class="label">PART C</div>
+        <div class="hint">bent + dented + scratched → SCRAP</div>
+      </div>
+    </div>
+        <div class="grid">
+      <div class="card">
+        <img src="qr-A.png" alt="QR for Part A" />
+        <div class="label">PART A</div>
+        <div class="hint">90° bend, no defects → PASS</div>
+      </div>
+      <div class="card">
+        <img src="qr-B.png" alt="QR for Part B" />
+        <div class="label">PART B</div>
+        <div class="hint">~75° underbend → REWORK</div>
+      </div>
+      <div class="card">
+        <img src="qr-C.png" alt="QR for Part C" />
+        <div class="label">PART C</div>
+        <div class="hint">bent + dented + scratched → SCRAP</div>
+      </div>
+    </div>
+        <div class="grid">
+      <div class="card">
+        <img src="qr-A.png" alt="QR for Part A" />
+        <div class="label">PART A</div>
+        <div class="hint">90° bend, no defects → PASS</div>
+      </div>
+      <div class="card">
+        <img src="qr-B.png" alt="QR for Part B" />
+        <div class="label">PART B</div>
+        <div class="hint">~75° underbend → REWORK</div>
+      </div>
+      <div class="card">
+        <img src="qr-C.png" alt="QR for Part C" />
+        <div class="label">PART C</div>
+        <div class="hint">bent + dented + scratched → SCRAP</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">AR QC Demo</string>
+    <string name="permission_camera_rationale">Camera access is required to scan parts.</string>
+    <string name="settings_room_pin_label">Room PIN (6–8 digits)</string>
+    <string name="settings_room_pin_hint">Same PIN on the laptop controller</string>
+    <string name="settings_save">Save &amp; Start</string>
+</resources>
