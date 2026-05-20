@@ -1,13 +1,17 @@
 #!/usr/bin/env node
-// Generate three printable QR codes (A, B, C) encoded as single-letter
-// strings. ML Kit's BarcodeScanner (configured for FORMAT_QR_CODE) reads
-// these and the app fires the matching verdict.
+// Generate the printable QR codes for both demos:
+//   QC Inspector:  'A', 'B', 'C'                     — three codes
+//   AR Builder:    'AP','AF','BP','BF','CP','CF'     — six codes (PASS / FAIL × component)
+//
+// ML Kit's BarcodeScanner (configured for FORMAT_QR_CODE) reads either
+// vocabulary and the app's QrAnalyzer dispatches into QC verdicts or
+// Builder verdicts based on the code length.
 //
 // Usage:  node tools/generate-qr-codes.mjs
-// Output: tools/qr-codes/qr-A.png, qr-B.png, qr-C.png  (each ~512x512)
+// Output: tools/qr-codes/qr-<code>.png  for every code (each ~512x512)
 //
-// Print at ~25mm square for a sticker-friendly size that the Argo's
-// camera reads reliably at arm's-length distance.
+// Print at ~25mm square for a sticker-friendly size that the camera reads
+// reliably at arm's-length distance.
 
 import { writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -17,9 +21,11 @@ import qrcode from 'qrcode';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTDIR = join(__dirname, 'qr-codes');
 
-const PARTS = ['A', 'B', 'C'];
+const QC_PARTS = ['A', 'B', 'C'];
+const BUILDER_PARTS = ['AP', 'AF', 'BP', 'BF', 'CP', 'CF'];
+const ALL = [...QC_PARTS, ...BUILDER_PARTS];
 
-for (const p of PARTS) {
+for (const p of ALL) {
   const png = await qrcode.toBuffer(p, {
     errorCorrectionLevel: 'M',
     type: 'png',
@@ -31,4 +37,10 @@ for (const p of PARTS) {
   await writeFile(file, png);
   console.log(`wrote ${file} (${png.length} bytes)`);
 }
-console.log('done. print 25mm square; attach one to each metal part.');
+console.log('');
+console.log('done. print at 25mm square; attach as follows:');
+console.log('  QC:      one sticker per part (A, B, C)');
+console.log('  Builder: TWO stickers per part, one per mountable face');
+console.log('           Part A: AP on the correct-orientation face, AF on the inverted face');
+console.log('           Part B: BP on correct, BF on inverted');
+console.log('           Part C: CP on correct, CF on inverted');

@@ -1,4 +1,4 @@
-package com.arqcdemo.app.ui
+package com.arqcdemo.app.builder.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,17 +20,22 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arqcdemo.app.Counts
+import com.arqcdemo.app.builder.BuilderCounts
+import com.arqcdemo.app.ui.components.FocusableButton
 import com.arqcdemo.app.ui.theme.HudDim
 import com.arqcdemo.app.ui.theme.Pass
-import com.arqcdemo.app.ui.theme.Rework
 import com.arqcdemo.app.ui.theme.Scrap
 
 @Composable
-fun CompleteScreen(counts: Counts, elapsedMs: Long, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
+fun BuilderCompleteScreen(
+    counts: BuilderCounts,
+    elapsedMs: Long,
+    focusedIndex: Int = 0,
+    modifier: Modifier = Modifier,
+) {
     val m = (elapsedMs / 60_000L).toString()
     val s = ((elapsedMs % 60_000L) / 1000L).toString().padStart(2, '0')
-    val total = counts.total
+    val attempts = counts.attempts
 
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
@@ -43,14 +48,14 @@ fun CompleteScreen(counts: Counts, elapsedMs: Long, focusedIndex: Int = 0, modif
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "INSPECTION COMPLETE",
+                text = "SESSION COMPLETE",
                 color = HudDim,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp,
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 4471 — $total ${if (total == 1) "part" else "parts"}",
+                text = "Job 5519 — ${counts.pass} ${if (counts.pass == 1) "component" else "components"} passed",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
@@ -59,18 +64,18 @@ fun CompleteScreen(counts: Counts, elapsedMs: Long, focusedIndex: Int = 0, modif
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Stat(modifier = Modifier.weight(1f), label = "Pass", value = counts.a.toString(), color = Pass)
-                Stat(modifier = Modifier.weight(1f), label = "Rework", value = counts.b.toString(), color = Rework)
-                Stat(modifier = Modifier.weight(1f), label = "Scrap", value = counts.c.toString(), color = Scrap)
+                Stat(modifier = Modifier.weight(1f), label = "Passed",   value = counts.pass.toString(), color = Pass)
+                Stat(modifier = Modifier.weight(1f), label = "Failures", value = counts.fail.toString(), color = Scrap)
+                Stat(modifier = Modifier.weight(1f), label = "Attempts", value = attempts.toString(),   color = HudDim)
             }
             Text(
-                text = "Cycle time   $m:$s",
+                text = "Total time   $m:$s",
                 color = HudDim,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 14.sp,
                 letterSpacing = 2.sp,
             )
-            com.arqcdemo.app.ui.components.FocusableButton(
+            FocusableButton(
                 label = "Reset",
                 focused = focusedIndex == 0,
                 onClick = {},

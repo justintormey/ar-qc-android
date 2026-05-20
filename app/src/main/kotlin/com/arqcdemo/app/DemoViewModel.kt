@@ -5,6 +5,8 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arqcdemo.app.input.WheelEvent
+import com.arqcdemo.app.input.WheelInput
 import com.arqcdemo.app.transport.BusMessage
 import com.arqcdemo.app.transport.StateBus
 import com.arqcdemo.app.transport.TransportState
@@ -27,24 +29,29 @@ data class Counts(val a: Int = 0, val b: Int = 0, val c: Int = 0) {
     val total get() = a + b + c
 }
 
+/**
+ * Each scene declares an ordered list of focusable actions; the wearer's
+ * scroll-wheel moves [focusedIndex] across them and clicking activates the
+ * focused one.
+ */
 data class UiState(
     val scene: Scene = Scene.Welcome,
     val counts: Counts = Counts(),
     val elapsedMs: Long = 0L,
     val transport: TransportState = TransportState.Initializing,
     val roomPin: String = "",
+    val focusedIndex: Int = 0,
 )
 
 /**
- * Single source of truth for the demo state machine. Mirrors the HTML
- * v1's src/demo.js exactly so the controller works unchanged:
+ * Single source of truth for the QC state machine.
  *
- *   welcome → scanning → verdictA/B/C → scanning → … → complete → welcome
+ *   welcome → scanning → verdict → scanning → … → complete → welcome
  *
- * The state bus drives transitions both from the network controller
- * (laptop tapping A/B/C/SCAN/End Demo) AND from the on-device QR
- * detector (camera spots QR-A, QR-B, or QR-C). Both paths fire the same
- * verdict actions.
+ * Transitions arrive from:
+ *   - the state bus (operator's laptop controller tapping A/B/C/SCAN/End/Reset)
+ *   - the on-device QR analyzer (camera spots A/B/C)
+ *   - the Argo scroll wheel (in-headset Accept/Reject/EndSession on Verdict)
  */
 class DemoViewModel : ViewModel() {
 
@@ -54,6 +61,13 @@ class DemoViewModel : ViewModel() {
     private var bus: StateBus? = null
     private var firstScanAt: Long = 0L
     private var started = false
+
+    init {
+        // Consume scroll-wheel input for the whole lifetime of this VM.
+        viewModelScope.launch {
+            WheelInput.events.collect { onWheel(it) }
+        }
+    }
 
     fun start(app: Application, roomPin: String) {
         if (started) return
@@ -85,7 +99,7 @@ class DemoViewModel : ViewModel() {
         newBus.send(BusMessage.Ready)
     }
 
-    /** Called by both the network bus AND the on-device QR analyzer. */
+    /** QR analyzer dispatches into this; same code path as the operator's tap. */
     fun onQrDetected(part: Char) {
         when (part) {
             'A', 'a' -> handle(BusMessage.Verdict("A"))
@@ -105,16 +119,64 @@ class DemoViewModel : ViewModel() {
         }
     }
 
+    // ─── Scroll-wheel handling ─────────────────────────────────────────
+    private fun onWheel(ev: WheelEvent) {
+        val actionCount = focusableActionCount(_ui.value.scene)
+        if (actionCount == 0) return
+
+        when (ev) {
+            WheelEvent.UP -> _ui.update { it.copy(focusedIndex = (it.focusedIndex - 1 + actionCount) % actionCount) }
+            WheelEvent.DOWN -> _ui.update { it.copy(focusedIndex = (it.focusedIndex + 1) % actionCount) }
+            WheelEvent.CLICK -> activateFocused()
+        }
+    }
+
+    /** Returns the count of focusable actions on the current scene. */
+    private fun focusableActionCount(scene: Scene): Int = when (scene) {
+        Scene.Welcome -> 1                                          // Begin
+        Scene.Scanning -> 0
+        Scene.VerdictA, Scene.VerdictB, Scene.VerdictC -> 3         // Accept / Reject / End Session
+        Scene.Complete -> 1                                         // Reset
+    }
+
+    /** Fires whatever the focused button does for the current scene. */
+    private fun activateFocused() {
+        val s = _ui.value
+        when (s.scene) {
+            Scene.Welcome -> goScanning()
+            Scene.Scanning -> Unit                                  // no UI buttons
+            Scene.VerdictA, Scene.VerdictB, Scene.VerdictC -> when (s.focusedIndex) {
+                0 -> { /* Accept */ goScanning() }
+                1 -> { /* Reject */ rejectAndScan(s.scene) }
+                2 -> { /* End session */ goComplete() }
+            }
+            Scene.Complete -> goWelcome()
+        }
+    }
+
+    private fun rejectAndScan(scene: Scene) {
+        // Decrement the counter the verdict had bumped, then return to scanning.
+        val c = _ui.value.counts
+        val rolled = when (scene) {
+            Scene.VerdictA -> c.copy(a = (c.a - 1).coerceAtLeast(0))
+            Scene.VerdictB -> c.copy(b = (c.b - 1).coerceAtLeast(0))
+            Scene.VerdictC -> c.copy(c = (c.c - 1).coerceAtLeast(0))
+            else -> c
+        }
+        _ui.update { it.copy(counts = rolled) }
+        goScanning()
+    }
+
     private fun goWelcome() {
         _ui.update {
-            it.copy(scene = Scene.Welcome, counts = Counts(), elapsedMs = 0L)
+            it.copy(scene = Scene.Welcome, counts = Counts(), elapsedMs = 0L, focusedIndex = 0)
         }
         firstScanAt = 0L
         bus?.send(BusMessage.Scene("welcome"))
     }
     private fun goScanning() {
         if (firstScanAt == 0L) firstScanAt = System.currentTimeMillis()
-        _ui.update { it.copy(scene = Scene.Scanning) }
+        _ui.update { it.copy(scene = Scene.Scanning, focusedIndex = 0) }
         bus?.send(BusMessage.Scene("scanning"))
     }
     private fun goVerdict(part: String) {
@@ -130,13 +192,14 @@ class DemoViewModel : ViewModel() {
             Scene.VerdictC -> _ui.value.counts.copy(c = _ui.value.counts.c + 1)
             else -> _ui.value.counts
         }
-        _ui.update { it.copy(scene = scene, counts = newCounts) }
+        // Default focused-index = 0 (Accept).
+        _ui.update { it.copy(scene = scene, counts = newCounts, focusedIndex = 0) }
         bus?.send(BusMessage.Scene("verdict-${part.uppercase()}"))
         bus?.send(BusMessage.VerdictShown(part.uppercase()))
     }
     private fun goComplete() {
         val elapsed = if (firstScanAt == 0L) 0L else System.currentTimeMillis() - firstScanAt
-        _ui.update { it.copy(scene = Scene.Complete, elapsedMs = elapsed) }
+        _ui.update { it.copy(scene = Scene.Complete, elapsedMs = elapsed, focusedIndex = 0) }
         bus?.send(BusMessage.Scene("complete"))
     }
 

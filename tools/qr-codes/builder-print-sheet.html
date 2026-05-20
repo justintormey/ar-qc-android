@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Builder — QR stickers</title>
+    <style>
+      @page { margin: 12mm; }
+      body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 16mm; color: #000; }
+      h1 { font-size: 16pt; margin: 0 0 4mm; }
+      p { font-size: 10pt; color: #444; margin: 0 0 8mm; }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8mm 14mm;
+        max-width: 180mm;
+        margin-bottom: 10mm;
+        padding-bottom: 6mm;
+        border-bottom: 0.4mm dashed #999;
+      }
+      .row:last-child { border-bottom: none; }
+      .row-label { grid-column: 1 / -1; font-weight: 700; font-size: 14pt; margin-bottom: 2mm; }
+      .card {
+        border: 0.4mm dashed #888;
+        padding: 5mm;
+        text-align: center;
+        page-break-inside: avoid;
+      }
+      .card img { width: 38mm; height: 38mm; image-rendering: pixelated; }
+      .card .label { font-family: ui-monospace, monospace; font-size: 12pt; font-weight: 700; margin-top: 3mm; }
+      .card .hint { font-size: 8pt; color: #666; margin-top: 1mm; line-height: 1.3; }
+      .card.pass { background: #f4fff4; }
+      .card.fail { background: #fff4f4; }
+    </style>
+  </head>
+  <body>
+    <h1>AR Builder — QR stickers (3 components × 2 faces)</h1>
+    <p>Cut each card along the dashed line. Each component takes two QRs — the <strong>P</strong> sticker goes on the face that faces outward when the sub-piece is mounted in the <em>correct</em> orientation; the <strong>F</strong> sticker goes on the opposite face (the one that faces outward when the sub-piece is mounted upside-down). The camera reads whichever face is visible after assembly and fires PASS or FAIL accordingly.</p>
+
+    <div class="row">
+      <div class="row-label">Component A</div>
+      <div class="card pass">
+        <img src="qr-AP.png" alt="QR AP" />
+        <div class="label">AP</div>
+        <div class="hint">Correct-orientation face → PASS</div>
+      </div>
+      <div class="card fail">
+        <img src="qr-AF.png" alt="QR AF" />
+        <div class="label">AF</div>
+        <div class="hint">Inverted-orientation face → FAIL</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-label">Component B</div>
+      <div class="card pass">
+        <img src="qr-BP.png" alt="QR BP" />
+        <div class="label">BP</div>
+        <div class="hint">Correct → PASS</div>
+      </div>
+      <div class="card fail">
+        <img src="qr-BF.png" alt="QR BF" />
+        <div class="label">BF</div>
+        <div class="hint">Inverted → FAIL</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-label">Component C</div>
+      <div class="card pass">
+        <img src="qr-CP.png" alt="QR CP" />
+        <div class="label">CP</div>
+        <div class="hint">Correct → PASS</div>
+      </div>
+      <div class="card fail">
+        <img src="qr-CF.png" alt="QR CF" />
+        <div class="label">CF</div>
+        <div class="hint">Inverted → FAIL</div>
+      </div>
+    </div>
+  </body>
+</html>

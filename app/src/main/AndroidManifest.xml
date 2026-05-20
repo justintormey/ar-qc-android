@@ -9,15 +9,34 @@
 
     <application
         android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/ic_launcher_qc"
+        android:roundIcon="@mipmap/ic_launcher_qc_round"
         android:theme="@style/Theme.ArQcDemo"
         android:supportsRtl="false">
 
+        <!-- QC inspection app — first launcher entry -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:icon="@mipmap/ic_launcher_qc"
+            android:roundIcon="@mipmap/ic_launcher_qc_round"
+            android:theme="@style/Theme.ArQcDemo"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Assembly Builder app — second launcher entry, same APK -->
+        <activity
+            android:name=".builder.BuilderActivity"
+            android:exported="true"
+            android:label="@string/builder_app_name"
+            android:icon="@mipmap/ic_launcher_builder"
+            android:roundIcon="@mipmap/ic_launcher_builder_round"
             android:theme="@style/Theme.ArQcDemo"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden">

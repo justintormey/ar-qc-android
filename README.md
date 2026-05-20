@@ -1,8 +1,13 @@
-# AR QC Demo — native Android APK
+# AR QC Demo + AR Builder — native Android APK
 
-Kotlin/Compose AR demonstration of a "quality-control inspection station" for AR smart glasses (built and tested on a Digilens Argo, but should work on any AOSP Android 12+ device with a back-facing camera). Sideloaded onto the headset via USB-C. Pairs with the operator's laptop or phone over WebRTC to drive the demo flow — and unlike the HTML sibling, this APK reads QR codes printed on the parts via Google ML Kit, **auto-firing the matching verdict without needing the operator to tap anything**.
+Two Kotlin/Compose AR demonstrations packaged in one APK with two launcher icons. Sideloaded onto a headset (built and tested on a Digilens Argo, but should work on any AOSP Android 12+ device with a back-facing camera). Pair each with an operator's laptop/phone controller over WebRTC.
 
-There's an [HTML sibling project](https://github.com/justintormey/ar-qc-demo) (`ar-qc-html`) that ships the same flow as a static site. The two clients can interoperate over the same WebRTC room PIN — you can run controller on one and headset on the other.
+- **AR QC Demo** (icon: `QC`) — quality-control inspection station. Operator or QR detection fires the matching verdict per part. PASS / REWORK / SCRAP, sorting metaphor.
+- **AR Builder** (icon: `B`) — assembly training. Participant uses a screwdriver to attach a sub-piece to each base component. The orientation determines which QR is exposed; the camera reads it and scores PASS or FAIL with rework guidance.
+
+Both apps live in the same APK at package `com.arqcdemo.app`. They share the WebRTC transport, camera infrastructure, and HUD primitives. Their state machines, scene content, and Compose trees are separate. Default room PINs: **QC = 471471, Builder = 526526**.
+
+There's an [HTML sibling project](https://github.com/justintormey/ar-qc-demo) (`ar-qc-html`) that ships the same flows as a static site. The two clients can interoperate over the same WebRTC room PIN — you can run controller on one and headset on the other.
 
 ---
 

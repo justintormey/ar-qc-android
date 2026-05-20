@@ -1,4 +1,4 @@
-package com.arqcdemo.app.ui
+package com.arqcdemo.app.builder.ui
 
 import android.view.ViewGroup
 import androidx.camera.view.PreviewView
@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,27 +21,89 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.arqcdemo.app.builder.BuilderScene
+import com.arqcdemo.app.builder.BuilderViewModel
 import com.arqcdemo.app.camera.CameraXController
 import com.arqcdemo.app.camera.QrAnalyzer
+import com.arqcdemo.app.ui.SetupScreen
+import com.arqcdemo.app.ui.components.ConnectionPill
 import com.arqcdemo.app.ui.components.CornerBrackets
 import com.arqcdemo.app.ui.components.ScanLine
+import com.arqcdemo.app.ui.components.StatusChip
 import com.arqcdemo.app.ui.theme.HudDim
 
+@Composable
+fun BuilderApp(
+    viewModel: BuilderViewModel,
+    cameraGranted: Boolean,
+    onPinChange: (String) -> Unit,
+) {
+    val state by viewModel.ui.collectAsState()
+
+    if (state.roomPin.isBlank()) {
+        SetupScreen(onSave = onPinChange)
+        return
+    }
+
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)
+    ) {
+        when (val s = state.scene) {
+            BuilderScene.Welcome -> BuilderWelcomeScreen(focusedIndex = state.focusedIndex)
+            is BuilderScene.Instructions -> BuilderInstructionsScreen(
+                partLabel = "Part ${s.part}",
+                focusedIndex = state.focusedIndex,
+            )
+            BuilderScene.Scanning -> BuilderScanningScreen(
+                cameraGranted = cameraGranted,
+                onBuilderQrDetected = viewModel::onBuilderQrDetected,
+            )
+            is BuilderScene.VerdictPass -> BuilderVerdictPassScreen(
+                part = s.part.toString(),
+                focusedIndex = state.focusedIndex,
+            )
+            is BuilderScene.VerdictFail -> BuilderVerdictFailScreen(
+                part = s.part.toString(),
+                focusedIndex = state.focusedIndex,
+            )
+            BuilderScene.Complete -> BuilderCompleteScreen(
+                counts = state.counts,
+                elapsedMs = state.elapsedMs,
+                focusedIndex = state.focusedIndex,
+            )
+        }
+
+        StatusChip(
+            text = state.scene.statusText,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 12.dp),
+        )
+        ConnectionPill(
+            state = state.transport,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 12.dp, end = 12.dp),
+        )
+    }
+}
+
 /**
- * Scanning state: live camera preview (CameraX) as the base layer with
- * corner brackets + cyan sweep line over the top. ML Kit QR analyzer
- * runs on every frame; emits 'A'/'B'/'C' → ViewModel via onQrDetected.
+ * Scanning screen that wires CameraX + ML Kit's QrAnalyzer for the Builder
+ * QR vocabulary (AP/AF/BP/BF/CP/CF). Identical visual to the QC scanning
+ * screen — corner brackets + sweep line + live preview.
  */
 @Composable
-fun ScanningScreen(
+fun BuilderScanningScreen(
     cameraGranted: Boolean,
-    onQrDetected: (Char) -> Unit,
+    onBuilderQrDetected: (part: Char, isPass: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val analyzer = remember { QrAnalyzer(onQc = onQrDetected) }
+    val analyzer = remember { QrAnalyzer(onBuilder = onBuilderQrDetected) }
     val controller = remember { CameraXController(context) }
 
     DisposableEffect(Unit) {

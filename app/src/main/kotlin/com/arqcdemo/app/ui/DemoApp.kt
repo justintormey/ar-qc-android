@@ -34,15 +34,19 @@ fun DemoApp(
         .background(Color.Black)
     ) {
         when (state.scene) {
-            Scene.Welcome -> WelcomeScreen()
+            Scene.Welcome -> WelcomeScreen(focusedIndex = state.focusedIndex)
             Scene.Scanning -> ScanningScreen(
                 cameraGranted = cameraGranted,
                 onQrDetected = viewModel::onQrDetected,
             )
-            Scene.VerdictA -> VerdictScreen(part = "A")
-            Scene.VerdictB -> VerdictScreen(part = "B")
-            Scene.VerdictC -> VerdictScreen(part = "C")
-            Scene.Complete -> CompleteScreen(counts = state.counts, elapsedMs = state.elapsedMs)
+            Scene.VerdictA -> VerdictScreen(part = "A", focusedIndex = state.focusedIndex)
+            Scene.VerdictB -> VerdictScreen(part = "B", focusedIndex = state.focusedIndex)
+            Scene.VerdictC -> VerdictScreen(part = "C", focusedIndex = state.focusedIndex)
+            Scene.Complete -> CompleteScreen(
+                counts = state.counts,
+                elapsedMs = state.elapsedMs,
+                focusedIndex = state.focusedIndex,
+            )
         }
 
         StatusChip(

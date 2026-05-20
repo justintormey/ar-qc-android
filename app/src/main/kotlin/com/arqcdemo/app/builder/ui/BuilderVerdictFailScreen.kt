@@ -1,4 +1,4 @@
-package com.arqcdemo.app.ui
+package com.arqcdemo.app.builder.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,62 +22,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arqcdemo.app.ui.components.FocusableButton
 import com.arqcdemo.app.ui.theme.HudDim
-import com.arqcdemo.app.ui.theme.Pass
-import com.arqcdemo.app.ui.theme.Rework
 import com.arqcdemo.app.ui.theme.Scrap
 
-private data class VerdictSpec(
-    val title: String,
-    val lines: List<Pair<String, String>>,
-    val verdictText: String,
-    val symbol: String,
-    val color: Color,
-    val cue: String,
-)
-
 @Composable
-fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
-    val spec = when (part.uppercase()) {
-        "A" -> VerdictSpec(
-            title = "PART A — JOB 4471",
-            lines = listOf(
-                "Bend angle" to "90.0° ± 0.1°",
-                "Surface" to "clean, no defects",
-                "Dimensions" to "within tolerance",
-            ),
-            verdictText = "PASS",
-            symbol = "✓",
-            color = Pass,
-            cue = "Place the part in the PASS zone",
-        )
-        "B" -> VerdictSpec(
-            title = "PART B — JOB 4471",
-            lines = listOf(
-                "Bend angle" to "75.4°",
-                "Target" to "90.0°",
-                "Deviation" to "−14.6° underbend",
-                "Surface" to "clean",
-            ),
-            verdictText = "REWORK",
-            symbol = "⚠",
-            color = Rework,
-            cue = "Place the part in the REWORK zone",
-        )
-        else -> VerdictSpec(
-            title = "PART C — JOB 4471",
-            lines = listOf(
-                "Bend angle" to "88.2° (in tolerance)",
-                "Surface" to "4 defects detected",
-                "Stress fracture" to "risk: HIGH",
-            ),
-            verdictText = "SCRAP",
-            symbol = "✕",
-            color = Scrap,
-            cue = "Place the part in the SCRAP zone",
-        )
-    }
-
+fun BuilderVerdictFailScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -93,14 +43,18 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
                     .padding(horizontal = 24.dp, vertical = 18.dp),
             ) {
                 Text(
-                    text = spec.title,
+                    text = "PART $part — JOB 5519",
                     color = HudDim,
                     fontFamily = FontFamily.Monospace,
                     fontSize = 13.sp,
                     letterSpacing = 2.sp,
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                for ((k, v) in spec.lines) {
+                listOf(
+                    "Bolts" to "2 of 2 installed",
+                    "Orientation" to "inverted — spec face is inward",
+                    "Surface" to "clean",
+                ).forEach { (k, v) ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -115,10 +69,10 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(text = spec.symbol, color = spec.color, fontSize = 32.sp)
+                    Text(text = "✕", color = Scrap, fontSize = 32.sp)
                     Text(
-                        text = "VERDICT: ${spec.verdictText}",
-                        color = spec.color,
+                        text = "VERDICT: FAIL",
+                        color = Scrap,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.sp,
@@ -128,34 +82,30 @@ fun VerdictScreen(part: String, focusedIndex: Int = 0, modifier: Modifier = Modi
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(2.dp, spec.color, RoundedCornerShape(12.dp))
+                    .border(2.dp, Scrap, RoundedCornerShape(12.dp))
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = spec.cue, color = spec.color, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = "Remove the two bolts. Flip the sub-piece 180°. Re-install.",
+                    color = Scrap,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
             }
-
-            // Wearer's scroll-wheel + click drives one of three actions.
-            // Each FocusableButton glows cyan when focusedIndex points at it.
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                com.arqcdemo.app.ui.components.FocusableButton(
-                    label = "Accept",
+                FocusableButton(
+                    label = "Rework",
                     focused = focusedIndex == 0,
                     onClick = {},
                     modifier = Modifier.weight(1f),
                 )
-                com.arqcdemo.app.ui.components.FocusableButton(
-                    label = "Reject",
-                    focused = focusedIndex == 1,
-                    onClick = {},
-                    modifier = Modifier.weight(1f),
-                )
-                com.arqcdemo.app.ui.components.FocusableButton(
+                FocusableButton(
                     label = "End session",
-                    focused = focusedIndex == 2,
+                    focused = focusedIndex == 1,
                     onClick = {},
                     modifier = Modifier.weight(1f),
                 )

@@ -1,9 +1,10 @@
-package com.arqcdemo.app
+package com.arqcdemo.app.builder
 
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,38 +13,40 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.ContextCompat
-import android.view.KeyEvent
 import androidx.lifecycle.lifecycleScope
+import com.arqcdemo.app.builder.ui.BuilderApp
 import com.arqcdemo.app.input.WheelInput
 import com.arqcdemo.app.settings.Prefs
-import com.arqcdemo.app.ui.DemoApp
 import com.arqcdemo.app.ui.theme.ArQcDemoTheme
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+/**
+ * Second launcher Activity in the same APK. Mirrors MainActivity but hosts
+ * the BuilderViewModel + BuilderApp Compose tree.
+ *
+ * Uses a different DataStore key for its room PIN (see Prefs.BUILDER_PIN_KEY)
+ * so QC and Builder can have independent default PINs.
+ */
+class BuilderActivity : ComponentActivity() {
 
-    private val viewModel: DemoViewModel by viewModels()
+    private val viewModel: BuilderViewModel by viewModels()
     private val cameraPermissionGranted = mutableStateOf(false)
-
-    /** Forward Argo scroll-wheel + click KeyEvents to the global WheelInput. */
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (WheelInput.dispatch(event)) return true
-        return super.dispatchKeyEvent(event)
-    }
 
     private val requestCamera = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         cameraPermissionGranted.value = granted
         Log.i(TAG, "camera permission granted=$granted")
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (WheelInput.dispatch(event)) return true
+        return super.dispatchKeyEvent(event)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,19 +60,14 @@ class MainActivity : ComponentActivity() {
             requestCamera.launch(Manifest.permission.CAMERA)
         }
 
-        // Load the persisted room PIN (if any) and start the bus. The Argo has
-        // no easy keyboard so we bake in a default PIN on first launch; the
-        // colleague's controller uses the same default. The user can later
-        // change it via the SetupScreen (which is only reached if the PIN is
-        // ever cleared, e.g. via `adb shell pm clear ...`).
         lifecycleScope.launch {
             val prefs = Prefs(applicationContext)
-            var pin = prefs.roomPin.first()
+            var pin = prefs.builderRoomPin.first()
             if (pin.isBlank()) {
-                prefs.setRoomPin(DEFAULT_ROOM_PIN)
-                pin = DEFAULT_ROOM_PIN
+                prefs.setBuilderRoomPin(DEFAULT_BUILDER_PIN)
+                pin = DEFAULT_BUILDER_PIN
             }
-            viewModel.start(this@MainActivity.application, pin)
+            viewModel.start(this@BuilderActivity.application, pin)
         }
 
         setContent {
@@ -79,15 +77,15 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .background(Color.Black)
                 ) {
-                    DemoApp(
+                    BuilderApp(
                         viewModel = viewModel,
                         cameraGranted = cameraPermissionGranted.value,
                         onPinChange = { newPin ->
                             lifecycleScope.launch {
-                                Prefs(applicationContext).setRoomPin(newPin)
+                                Prefs(applicationContext).setBuilderRoomPin(newPin)
                                 viewModel.changeRoomPin(applicationContext, newPin)
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -95,8 +93,8 @@ class MainActivity : ComponentActivity() {
     }
 
     companion object {
-        const val TAG = "ARQC"
-        /** Baked-in default room PIN used on first launch. */
-        const val DEFAULT_ROOM_PIN = "471471"
+        const val TAG = "ARQC.Builder"
+        /** Baked-in default room PIN for Builder. Different from QC's 471471. */
+        const val DEFAULT_BUILDER_PIN = "526526"
     }
 }

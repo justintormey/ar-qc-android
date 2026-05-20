@@ -1,4 +1,4 @@
-package com.arqcdemo.app.ui
+package com.arqcdemo.app.builder.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,7 +22,7 @@ import com.arqcdemo.app.ui.components.FocusableButton
 import com.arqcdemo.app.ui.theme.HudDim
 
 @Composable
-fun WelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
+fun BuilderWelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
@@ -34,29 +34,29 @@ fun WelcomeScreen(focusedIndex: Int = 0, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "QC STATION 3",
+                text = "AR ASSEMBLY TRAINER",
                 color = HudDim,
                 fontFamily = FontFamily.Monospace,
                 fontSize = 14.sp,
                 letterSpacing = 3.sp,
             )
             Text(
-                text = "Job 4471 — 16-ga bracket inspection",
+                text = "Job 5519 — bracket sub-assembly",
                 color = Color.White,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
             )
-            Text(text = "Three parts in front of you.", color = Color.White, fontSize = 18.sp)
-            Text(text = "Three verdicts: pass, rework, scrap.", color = Color.White, fontSize = 18.sp)
+            Text(text = "Three components to assemble.", color = Color.White, fontSize = 18.sp)
+            Text(text = "Attach the sub-piece. Hold up for inspection.", color = Color.White, fontSize = 18.sp)
             Text(
-                text = "The glasses do the analysis. You make the call.",
+                text = "Orientation matters — flip if you fail.",
                 color = HudDim,
                 fontSize = 16.sp,
             )
             FocusableButton(
                 label = "BEGIN",
                 focused = focusedIndex == 0,
-                onClick = { /* activation flows through ViewModel.onWheel */ },
+                onClick = {},
                 modifier = Modifier.padding(top = 12.dp),
             )
         }
