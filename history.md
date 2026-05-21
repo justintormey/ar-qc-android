@@ -73,6 +73,12 @@ The debug APK is ~50 MB because `libjingle_peerconnection_so.so` (~25 MB) and `l
 - **Move to `androidx.lifecycle.compose.LocalLifecycleOwner`** — drop the deprecation warning.
 - **Release build signing** — currently only `assembleDebug`. Add a release signing config + `assembleRelease` when distribution beyond sideload is needed.
 
+### Designed but not yet implemented
+
+Detailed designs live under [`docs/future-enhancements/`](docs/future-enhancements/) — pick one up when its turn comes.
+
+- **Orientation-alignment CV** ([`docs/future-enhancements/cv-orientation-alignment.md`](docs/future-enhancements/cv-orientation-alignment.md)) — extract per-QR rotation from ML Kit's existing `cornerPoints`, introduce a `StepRule` abstraction in `BuilderViewModel`, and let any Builder step opt into a "QRs must be aligned within N°" check. Also documents text-OCR + custom-TFLite-icon paths as research-only future alternatives to QR codes.
+
 ## Related
 
 - [`ar-qc-html`](https://github.com/justintormey/ar-qc-demo) — HTML/Three.js + WebRTC sibling shipped at `demo.justintormey.com/ar-qc/`.
