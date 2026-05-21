@@ -11,7 +11,7 @@ On the Digilens Argo specifically, the default browser is Firefox 105 and its `g
 The native Android app exists to unlock those two capabilities:
 
 1. **Live CameraX preview** as the scanning-scene background — the participant sees themselves looking at the part, framed by the HUD overlays.
-2. **Real on-device ML Kit Barcode scanning** — QR codes printed and stuck to each metal part are decoded in ~30 ms; the matching verdict fires automatically, no operator-tap-in-the-loop required.
+2. **Real on-device ML Kit Barcode scanning** — QR codes stuck to each 3D-printed part (QC) and to each angle-bracket face (Builder) are decoded in ~30 ms; the matching verdict fires automatically, no operator-tap-in-the-loop required. Builder's step 3 takes the full Set of QRs visible per frame and applies a compound rule (`BP` AND `CP` both required for PASS).
 
 The operator controller remains the manual-override path. Either input (QR detection or operator tap) drives the same state machine.
 
